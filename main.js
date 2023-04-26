@@ -12,12 +12,20 @@ let map = L.map("map").setView([
     stephansdom.lat, stephansdom.lng
 ], 12);
 
+map.addControl(new L.Control.Fullscreen({
+    title: {
+        'false': 'View Fullscreen',
+        'true': 'Exit Fullscreen'
+    }
+}));
+
 //thematische Layer 
 let themaLayer = {
-    stops: L.featureGroup(),
-    lines: L.featureGroup(),
-    zones: L.featureGroup(),
+    stops: L.featureGroup().addTo(map),
+    lines: L.featureGroup().addTo(map),
+    zones: L.featureGroup().addTo(map),
     sights: L.featureGroup().addTo(map),
+}
 
 // Hintergrundlayer
 let layerControl = L.control.layers({
@@ -28,17 +36,12 @@ let layerControl = L.control.layers({
     "BasemapAT Oberfläche": L.tileLayer.provider("BasemapAT.surface"),
     "BasemapAT Orthofoto": L.tileLayer.provider("BasemapAT.orthofoto"),
     "BasemapAT Beschriftung": L.tileLayer.provider("BasemapAT.overlay")
-},{
+}, {
     "Vienna Sightseeing Haltestellen": themaLayer.stops,
     "Vienna Sightseeing Linien": themaLayer.lines,
     "Fußgängerzonen": themaLayer.zones,
     "Sehenswürdigkeiten": themaLayer.sights,
 }).addTo(map);
-
-// Marker Stephansdom
-L.marker([
-    stephansdom.lat, stephansdom.lng
-]).addTo(map).bindPopup(stephansdom.title).openPopup();
 
 // Maßstab
 L.control.scale({
@@ -49,25 +52,45 @@ L.control.scale({
 //asynchrone Funktion, damit schneller geladen werden kann
 async function showStops(url) {
     let response = await fetch(url); //Anfrage, Antwort kommt zurück
-    let jsondata = await response.json (); //json Daten aus Response entnehmen 
-    L.geoJSON(jsondata).addTo(themaLayer.stops); //alle Busstopps anzeigen als Marker
+    let jsondata = await response.json(); //json Daten aus Response entnehmen 
+    L.geoJSON(jsondata, {
+        onEachFeature: function (feature, layer) {
+            let prop = feature.properties; //Variable damit kürzer; * steht als Platzhalter für Bildunterschrift, Link für Infos, nur 1 Tab für Links
+            layer.bindPopup(`      
+            <h4> <i class="fa-solid fa-bus"></i> ${prop.LINE_NAME}</h4>
+            <station> ${prop.STAT_NAME} </station>           
+            `);
+            console.log(prop.NAME);
+        }
+    }).addTo(themaLayer.stops); //alle Busstopps anzeigen als Marker
     //console.log(response);
 }
 showStops("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:TOURISTIKHTSVSLOGD&srsName=EPSG:4326&outputFormat=json"); //aufrufen der Funktion 
 
 async function showLines(url) {
-    let response = await fetch(url); 
-    let jsondata = await response.json ();
-    L.geoJSON(jsondata).addTo(themaLayer.lines); 
+    let response = await fetch(url);
+    let jsondata = await response.json();
+    L.geoJSON(jsondata, {
+        onEachFeature: function (feature, layer) {
+            let prop = feature.properties; //Variable damit kürzer; * steht als Platzhalter für Bildunterschrift, Link für Infos, nur 1 Tab für Links
+            layer.bindPopup(`   
+            <h4> <i class="fa-solid fa-bus"></i> ${prop.LINE_NAME}</h4>  
+            <start> <i class="fa-regular fa-circle-stop"></i> ${prop.FROM_NAME} </start> </br>
+            <i class="fa-solid fa-arrow-down"></i> </br>
+            <end> <i class="fa-regular fa-circle-stop"></i> ${prop.TO_NAME}</end>          
+            `);
+            console.log(prop.NAME);
+        }
+    }).addTo(themaLayer.lines);
     //console.log(response);
 }
 showLines("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:TOURISTIKLINIEVSLOGD&srsName=EPSG:4326&outputFormat=json");
 
 async function showSights(url) {
-    let response = await fetch(url); 
-    let jsondata = await response.json (); 
+    let response = await fetch(url);
+    let jsondata = await response.json();
     L.geoJSON(jsondata, {
-        onEachFeature: function(feature,layer){
+        onEachFeature: function (feature, layer) {
             let prop = feature.properties; //Variable damit kürzer; * steht als Platzhalter für Bildunterschrift, Link für Infos, nur 1 Tab für Links
             layer.bindPopup(`
             <img src = "${prop.THUMBNAIL}" alt="*" > 
@@ -76,15 +99,25 @@ async function showSights(url) {
             `);
             console.log(prop.NAME);
         }
-    }).addTo(themaLayer.sights); 
+    }).addTo(themaLayer.sights);
     //console.log(response);
 }
 showSights("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:SEHENSWUERDIGOGD&srsName=EPSG:4326&outputFormat=json");
 
 async function showZones(url) {
-    let response = await fetch(url); 
-    let jsondata = await response.json (); 
-    L.geoJSON(jsondata).addTo(themaLayer.zones); 
+    let response = await fetch(url);
+    let jsondata = await response.json();
+    L.geoJSON(jsondata, {
+        onEachFeature: function (feature, layer) {
+            let prop = feature.properties; //Variable damit kürzer; * steht als Platzhalter für Bildunterschrift, Link für Infos, nur 1 Tab für Links
+            layer.bindPopup(`
+            <h4> Fußgängerzone${prop.ADRESSE} </h4>
+            <opening> <i class="fa-solid fa-clock"></i> ${prop.ZEITRAUM} </opening> </br> </br>
+            <info> <i class="fa-solid fa-circle-info"></i> ${prop.AUSN_TEXT}</info>
+            `);
+            console.log(prop.NAME);
+        }
+    }).addTo(themaLayer.zones);
     //console.log(response);
 }
 showZones("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:FUSSGEHERZONEOGD&srsName=EPSG:4326&outputFormat=json");
