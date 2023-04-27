@@ -10,7 +10,7 @@ let stephansdom = {
 // Karte initialisieren
 let map = L.map("map").setView([
     stephansdom.lat, stephansdom.lng
-], 12);
+], 15);
 
 map.addControl(new L.Control.Fullscreen({
     title: {
@@ -60,7 +60,7 @@ async function showStops(url) {
             <h4> <i class="fa-solid fa-bus"></i> ${prop.LINE_NAME}</h4>
             <station> ${prop.STAT_NAME} </station>           
             `);
-            console.log(prop.NAME);
+            //console.log(prop.NAME);
         }
     }).addTo(themaLayer.stops); //alle Busstopps anzeigen als Marker
     //console.log(response);
@@ -79,7 +79,7 @@ async function showLines(url) {
             <i class="fa-solid fa-arrow-down"></i> </br>
             <end> <i class="fa-regular fa-circle-stop"></i> ${prop.TO_NAME}</end>          
             `);
-            console.log(prop.NAME);
+            //console.log(prop.NAME);
         }
     }).addTo(themaLayer.lines);
     //console.log(response);
@@ -97,7 +97,7 @@ async function showSights(url) {
             <h4><a href="${prop.WEITERE_INF}" target="Wien">${prop.NAME}</a></h4>
             <address>${prop.ADRESSE}</adress>
             `);
-            console.log(prop.NAME);
+            //console.log(prop.NAME);
         }
     }).addTo(themaLayer.sights);
     //console.log(response);
@@ -112,10 +112,10 @@ async function showZones(url) {
             let prop = feature.properties; //Variable damit kürzer; * steht als Platzhalter für Bildunterschrift, Link für Infos, nur 1 Tab für Links
             layer.bindPopup(`
             <h4> Fußgängerzone${prop.ADRESSE} </h4>
-            <opening> <i class="fa-solid fa-clock"></i> ${prop.ZEITRAUM} </opening> </br> </br>
-            <info> <i class="fa-solid fa-circle-info"></i> ${prop.AUSN_TEXT}</info>
-            `);
-            console.log(prop.NAME);
+            <opening> <i class="fa-solid fa-clock"></i> ${prop.ZEITRAUM"dauerhaft"} </opening> </br> </br>
+            <info> <i class="fa-solid fa-circle-info"></i> ${prop.AUSN_TEXT"keine Ausnahmen"}</info>
+            `)
+    //console.log(prop.NAME);
         }
     }).addTo(themaLayer.zones);
     //console.log(response);
