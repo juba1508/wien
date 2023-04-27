@@ -53,7 +53,30 @@ L.control.scale({
 async function showStops(url) {
     let response = await fetch(url); //Anfrage, Antwort kommt zurück
     let jsondata = await response.json(); //json Daten aus Response entnehmen 
+    let busstopsColors = {
+        1: "#FF4136", //Red Line
+        2: "#FFDC00",//Yellow Line
+        3: "#0074D9", //Blue Line 
+        4: "#2ECC40", //Green Line
+        5: "#AAAAAA", //Grey Line
+        6: "#FF851B", //Orange Line
     L.geoJSON(jsondata, {
+        style: function (feature) {
+            return {
+                color: busstopsColors[feature.properties.stops.BUSSTOPS_ID],
+                weight: 3,
+                dashArray: [10, 6],
+            }; //https://leafletjs.com/reference.html#geojson-style
+        },
+        pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {
+                icon: L.icon({
+                    iconUrl: "icons/busstop.png",
+                    iconAnchor: [16, 37],
+                    popupAnchor: [0, -37],
+                })
+            });
+        },
         onEachFeature: function (feature, layer) {
             let prop = feature.properties; //Variable damit kürzer; * steht als Platzhalter für Bildunterschrift, Link für Infos, nur 1 Tab für Links
             layer.bindPopup(`      
