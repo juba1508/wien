@@ -21,9 +21,9 @@ map.addControl(new L.Control.Fullscreen({
 
 //thematische Layer 
 let themaLayer = {
-    stops: L.featureGroup().addTo(map),
-    lines: L.featureGroup().addTo(map),
-    zones: L.featureGroup().addTo(map),
+    stops: L.featureGroup(),
+    lines: L.featureGroup(),
+    zones: L.featureGroup(),
     sights: L.featureGroup().addTo(map),
 }
 
@@ -60,10 +60,8 @@ async function showStops(url) {
             <h4> <i class="fa-solid fa-bus"></i> ${prop.LINE_NAME}</h4>
             <station> ${prop.STAT_NAME} </station>           
             `);
-            //console.log(prop.NAME);
         }
     }).addTo(themaLayer.stops); //alle Busstopps anzeigen als Marker
-    //console.log(response);
 }
 showStops("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:TOURISTIKHTSVSLOGD&srsName=EPSG:4326&outputFormat=json"); //aufrufen der Funktion 
 
@@ -96,10 +94,8 @@ async function showLines(url) {
             <end> <i class="fa-regular fa-circle-stop"></i> ${prop.TO_NAME}</end>          
             `);
             lineNames[prop.LINE_ID] = prop.LINE_NAME
-            //console.log(prop.NAME);
         }
     }).addTo(themaLayer.lines);
-    console.log(lineNames);
 }
 showLines("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:TOURISTIKLINIEVSLOGD&srsName=EPSG:4326&outputFormat=json");
 
@@ -107,6 +103,16 @@ async function showSights(url) {
     let response = await fetch(url);
     let jsondata = await response.json();
     L.geoJSON(jsondata, {
+        pointToLayer: function(feature, latlng) {
+            L.marker(latlng).addTo(map)
+            return L.marker(latlng, {
+                icon: L.icon({
+                    iconUrl: "icons/photo.png",
+                    iconAnchor: [16, 37],
+                    popupAnchor: [0, -37],
+                })
+            });
+        },
         onEachFeature: function (feature, layer) {
             let prop = feature.properties; //Variable damit kürzer; * steht als Platzhalter für Bildunterschrift, Link für Infos, nur 1 Tab für Links
             layer.bindPopup(`
@@ -114,10 +120,8 @@ async function showSights(url) {
             <h4><a href="${prop.WEITERE_INF}" target="Wien">${prop.NAME}</a></h4>
             <address>${prop.ADRESSE}</adress>
             `);
-            //console.log(prop.NAME);
         }
     }).addTo(themaLayer.sights);
-    //console.log(response);
 }
 showSights("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:SEHENSWUERDIGOGD&srsName=EPSG:4326&outputFormat=json");
 
@@ -139,10 +143,8 @@ async function showZones(url) {
             <opening> <i class="fa-solid fa-clock"></i> ${prop.ZEITRAUM||"dauerhaft"} </opening> </br> </br>
             <info> <i class="fa-solid fa-circle-info"></i> ${prop.AUSN_TEXT||"keine Ausnahmen"}</info>
             `)
-    //console.log(prop.NAME);
         }
     }).addTo(themaLayer.zones);
-    console.log(response);
 }
 showZones("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:FUSSGEHERZONEOGD&srsName=EPSG:4326&outputFormat=json");
 
