@@ -125,6 +125,13 @@ async function showZones(url) {
     let response = await fetch(url);
     let jsondata = await response.json();
     L.geoJSON(jsondata, {
+        style: function (feature)
+           { return {    
+                color:"#F012BE",
+                weight: 1,
+                opacity: 0.4,
+            };
+        },
         onEachFeature: function (feature, layer) {
             let prop = feature.properties; //Variable damit kürzer; * steht als Platzhalter für Bildunterschrift, Link für Infos, nur 1 Tab für Links
             layer.bindPopup(`
@@ -135,7 +142,7 @@ async function showZones(url) {
     //console.log(prop.NAME);
         }
     }).addTo(themaLayer.zones);
-    //console.log(response);
+    console.log(response);
 }
 showZones("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:FUSSGEHERZONEOGD&srsName=EPSG:4326&outputFormat=json");
 
