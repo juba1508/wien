@@ -70,7 +70,23 @@ showStops("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&vers
 async function showLines(url) {
     let response = await fetch(url);
     let jsondata = await response.json();
+    let lineNames = {};
+    let lineColors = {
+        1: "#FF4136", //Red Line
+        2: "#FFDC00",//Yellow Line
+        3: "#0074D9", //Blue Line 
+        4: "#2ECC40", //Green Line
+        5: "#AAAAAA", //Grey Line
+        6: "#FF851B", //Orange Line
+    }
     L.geoJSON(jsondata, {
+        style: function (feature) {
+            return {
+                color: lineColors[feature.properties.LINE_ID],
+                weight: 3,
+                dashArray: [10, 6],
+            }; //https://leafletjs.com/reference.html#geojson-style
+        },
         onEachFeature: function (feature, layer) {
             let prop = feature.properties; //Variable damit kürzer; * steht als Platzhalter für Bildunterschrift, Link für Infos, nur 1 Tab für Links
             layer.bindPopup(`   
@@ -79,10 +95,11 @@ async function showLines(url) {
             <i class="fa-solid fa-arrow-down"></i> </br>
             <end> <i class="fa-regular fa-circle-stop"></i> ${prop.TO_NAME}</end>          
             `);
+            lineNames[prop.LINE_ID] = prop.LINE_NAME
             //console.log(prop.NAME);
         }
     }).addTo(themaLayer.lines);
-    //console.log(response);
+    console.log(lineNames);
 }
 showLines("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:TOURISTIKLINIEVSLOGD&srsName=EPSG:4326&outputFormat=json");
 
@@ -112,8 +129,8 @@ async function showZones(url) {
             let prop = feature.properties; //Variable damit kürzer; * steht als Platzhalter für Bildunterschrift, Link für Infos, nur 1 Tab für Links
             layer.bindPopup(`
             <h4> Fußgängerzone${prop.ADRESSE} </h4>
-            <opening> <i class="fa-solid fa-clock"></i> ${prop.ZEITRAUM"dauerhaft"} </opening> </br> </br>
-            <info> <i class="fa-solid fa-circle-info"></i> ${prop.AUSN_TEXT"keine Ausnahmen"}</info>
+            <opening> <i class="fa-solid fa-clock"></i> ${prop.ZEITRAUM||"dauerhaft"} </opening> </br> </br>
+            <info> <i class="fa-solid fa-circle-info"></i> ${prop.AUSN_TEXT||"keine Ausnahmen"}</info>
             `)
     //console.log(prop.NAME);
         }
