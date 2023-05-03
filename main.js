@@ -25,6 +25,7 @@ let themaLayer = {
     lines: L.featureGroup().addTo(map),
     zones: L.featureGroup().addTo(map),
     sights: L.featureGroup().addTo(map),
+    hotels: L.featureGroup().addTo(map),
 }
 
 // Hintergrundlayer
@@ -41,6 +42,7 @@ let layerControl = L.control.layers({
     "Vienna Sightseeing Linien": themaLayer.lines,
     "Fußgängerzonen": themaLayer.zones,
     "Sehenswürdigkeiten": themaLayer.sights,
+    "Hotels": themaLayer.hotels,
 }).addTo(map);
 
 // Maßstab
@@ -138,6 +140,15 @@ async function showZones(url) {
     let response = await fetch(url);
     let jsondata = await response.json();
     L.geoJSON(jsondata, {
+        pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {
+                icon: L.icon({
+                    iconUrl: "icons/photo.png",
+                    iconAnchor: [16, 37],
+                    popupAnchor: [0, -37],
+                })
+            });
+        },
         style: function (feature)
            { return {    
                 color:"#F012BE",
@@ -156,4 +167,34 @@ async function showZones(url) {
     }).addTo(themaLayer.zones);
 }
 showZones("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:FUSSGEHERZONEOGD&srsName=EPSG:4326&outputFormat=json");
+
+//Hotels
+async function showHotels (url) {
+    let response = await fetch(url);
+    let jsondata = await response.json();
+    L.geoJSON(jsondata, {
+        pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {
+                icon: L.icon({
+                    iconUrl: "icons/hotel.png",
+                    iconAnchor: [16, 37],
+                    popupAnchor: [0, -37],
+                })
+            });
+        },
+        onEachFeature: function (feature, layer) {
+            let prop = feature.properties; //Variable damit kürzer; * steht als Platzhalter für Bildunterschrift, Link für Infos, nur 1 Tab für Links
+            layer.bindPopup(`
+                <h3> ${prop.BETRIEB}
+                <h4> ${prop.BETRIEBSART_TXT} ${KATEGORIE_TXT}
+                <hr></hr>
+                <telefon><a href="tel:${prop.KONTAKT_TEL}">${prop.KONTAKT_TEL}</telefon><br>
+                <email><a href="${prop.KONTAKT_EMAIL}">${prop.KONTAKT_EMAIL}</a></email><br>
+                <website><a href="${prop.WEBLINK1}">Homepage</a></email>
+                `);
+                //console.log(pro.NAME)    
+        }
+    }).addTo(themaLayer.hotels);
+}
+showHotels("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:UNTERKUNFTOGD&srsName=EPSG:4326&outputFormat=json")
 
