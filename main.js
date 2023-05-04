@@ -176,27 +176,27 @@ async function showHotels (url) {
         pointToLayer: function(feature, latlng) {
             return L.marker(latlng, {
                 icon: L.icon({
-                    if(KATEGORIE_TXT='1*') {
+                    if(KATEGORIE_TXT="1*") {
                         iconUrl: 'icons/hotel_1.png',
                         popupAnchor: [0, -37],
                         iconAnchor: [16, 37],
                     },
-                    else if(KATEGORIE_TXT==='2*'){
+                    else if(KATEGORIE_TXT="2*"){
                         iconUrl: 'icons/hotel_2.png',
                         popupAnchor: [0, -37],
                         iconAnchor: [16, 37],
                     },
-                    else if(KATEGORIE_TXT==='3*'){
+                    else if(KATEGORIE_TXT="3*"){
                         iconUrl: 'icons/hotel_3.png',
                         popupAnchor: [0, -37],
                         iconAnchor: [16, 37],
                     },
-                    else if(KATEGORIE_TXT==='4*'){
+                    else if(KATEGORIE_TXT="4*"){
                         iconUrl: 'icons/hotel_4.png',
                         popupAnchor: [0, -37],
                         iconAnchor: [16, 37],
                     },
-                    else if(KATEGORIE_TXT==='5*'){
+                    else if(KATEGORIE_TXT="5*"){
                         iconUrl: 'icons/hotel_5.png',
                         popupAnchor: [0, -37],
                         iconAnchor: [16, 37],
