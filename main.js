@@ -33,6 +33,14 @@ let themaLayer = {
 //LeaftletHash
 new L.Hash(map);
 
+//Leaflet MiniMap
+var miniMap = new L.Control.MiniMap(
+    L.tileLayer.provider("BasemapAT.basemap").addTo(map),
+        {toggleDisplay:true,
+        minimized: true
+        }
+    ).addTo(map);
+
 // Hintergrundlayer
 let layerControl = L.control.layers({
     "BasemapAT Grau": L.tileLayer.provider("BasemapAT.grau").addTo(map),
