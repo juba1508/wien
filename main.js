@@ -30,6 +30,9 @@ let themaLayer = {
     })
 }
 
+//LeaftletHash
+new L.Hash(map);
+
 // Hintergrundlayer
 let layerControl = L.control.layers({
     "BasemapAT Grau": L.tileLayer.provider("BasemapAT.grau").addTo(map),
